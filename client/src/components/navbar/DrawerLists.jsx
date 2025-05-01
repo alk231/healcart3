@@ -114,12 +114,7 @@ const DrawerLists = ({ drawerWidth = 260, isSmallScreen }) => {
           icon={<IconAward size={20} />}
         />
 
-        <SingleNavLink
-          link="/review"
-          text="Review"
-          icon={<IconClipboardHeart size={20} />}
-        />
-				
+
         <SingleNavLink
           link="/health-tips"
           text="Health Tips"

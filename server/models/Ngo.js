@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-
 const ngoSchema = new mongoose.Schema(
   {
     ngoName: { type: String, required: true },

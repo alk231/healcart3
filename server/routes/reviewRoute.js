@@ -1,13 +1,15 @@
-const express = require("express");
+const router = require("express").Router();
 const {
-  createReview,
-  getReviews,
+	getAllReviewsController,
+	addReviewController,
+	getUserReviewController,
+	getMedicineRatingController,
 } = require("../controllers/reviewController");
 const { verifyJWT } = require("../middlewares/jwtMiddleware");
 
-const router = express.Router();
-
-router.post("/create", verifyJWT, createReview); // Only logged-in NGOs
-router.get("/:medicineId", getReviews); // Public
+router.get("/:medicineId", getAllReviewsController);
+router.get("/medicine/:medicineId", getMedicineRatingController);
+router.get("/user/:medicineId", verifyJWT, getUserReviewController);
+router.post("/add", verifyJWT, addReviewController);
 
 module.exports = router;

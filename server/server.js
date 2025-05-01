@@ -32,6 +32,7 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 8080;
 
+console.log("Connecting to database...")
 connectDB()
 	.then(() => {
 		app.listen(PORT, () => {

@@ -6,6 +6,10 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
 import "react-lazy-load-image-component/src/effects/blur.css";
+import { useEffect } from "react";
+
+
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<React.StrictMode>

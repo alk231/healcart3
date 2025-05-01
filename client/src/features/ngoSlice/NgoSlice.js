@@ -4,12 +4,21 @@ export const ngoApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     registerNgo: builder.mutation({
       query: (body) => ({
-        url: "/Ngo/register",
+        url: "/ngo/register",
         method: "POST",
         body,
+      }),
+    }),
+
+    validateNgoVerificationId: builder.mutation({
+      query: (verificationId) => ({
+        url: "/ngo/verify",
+        method: "POST",
+        body: { verificationId },
       }),
     }),
   }),
 });
 
-export const { useRegisterNgoMutation } = ngoApi;
+export const { useRegisterNgoMutation, useValidateNgoVerificationIdMutation } =
+  ngoApi;

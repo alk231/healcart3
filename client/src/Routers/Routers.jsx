@@ -32,6 +32,7 @@ import Admin from "./Admin";
 import AlreadyLoggedIn from "./AlreadyLoggedIn";
 import Ngo from "../pages/Ngo";
 import AdminDashboard from "../pages/AdminDashboard";
+import MedicineDetails from "../pages/MedicineDetails";
 
 const Routers = () => {
 	return (
@@ -176,6 +177,16 @@ const Routers = () => {
               </Protected>
             }
           />
+
+          <Route
+            path="/medicines/:medicineId"
+            element={
+              <Protected>
+                <MedicineDetails />
+              </Protected>
+            }
+          />
+
           <Route path="best-donors" element={<BestDonors />} />
           <Route
             path="pending"

@@ -1,41 +1,95 @@
-const asyncHandler = require("express-async-handler");
+const { Types } = require("mongoose");
 const Review = require("../models/ReviewModel");
-const Medicine = require("../models/MedicineModel");
-const User = require("../models/UserModel"); // Assuming both NGO & normal user use this
-const Ngo = require("../models/Ngo");
+const asyncHandler = require("express-async-handler");
 
-// Create a review (All authenticated users allowed)
-exports.createReview = asyncHandler(async (req, res) => {
-  const { rating, review, medicineId } = req.body;
-	console.log(medicineId)
-  const { id: userId } = req.decoded;
+exports.addReviewController = asyncHandler(async (req, res) => {
+	const { decoded, body } = req;
 
-  // Optional: Check if the medicine exists
-  const medicine = await Medicine.findById(medicineId);
-	console.log(medicine)
-  if (!medicine) {
-    res.status(404);
-    throw new Error("Medicine not found.");
-  }
+	const isAlreadyReviewed = await Review.exists({ user: decoded.id, medicine: body.medicine });
 
-  // Save the review
-  const newReview = await Review.create({
-    user: userId,
-    medicine: medicineId,
-    rating,
-    review,
-  });
+	if (isAlreadyReviewed) return res.status(409).json({ msg: "already_reviewed", review: null });
 
-  res.status(201).json({ message: "Review submitted", review: newReview });
+	const addReview = await new Review({ ...body, user: decoded.id }).save();
+
+	if (addReview) {
+		return res.status(201).json({
+			msg: "review_added",
+			review: addReview,
+		});
+	}
+
+	res.status(500).json({
+		msg: "review_not_added",
+		review: null,
+	});
 });
 
-// Get reviews for a specific medicine (visible to all)
-exports.getReviews = asyncHandler(async (req, res) => {
-  const { medicineId } = req.params;
+exports.getAllReviewsController = asyncHandler(async (req, res) => {
+	const { medicineId } = req.params;
 
-  const reviews = await Review.find({ medicine: medicineId })
-    .populate("user", "ngoName name email user_type") // Adjust fields as per model
-    .sort({ createdAt: -1 });
+	const reviews = await Review.find({ medicine: medicineId });
 
-  res.status(200).json(reviews);
+	if (reviews.length) {
+		return res.status(200).json({
+			msg: "reviews_found",
+			reviews,
+		});
+	}
+
+	res.status(200).json({
+		msg: "reviews_not_found",
+		reviews: [],
+	});
+});
+
+exports.getUserReviewController = asyncHandler(async (req, res) => {
+	const {
+		decoded,
+		params: { medicineId },
+	} = req;
+
+	const review = await Review.findOne({ medicine: medicineId, user: decoded.id });
+
+	if (review) {
+		return res.status(200).json({
+			msg: "review_found",
+			review,
+		});
+	}
+
+	res.status(200).json({
+		msg: "review_not_found",
+		review: null,
+	});
+});
+
+exports.getMedicineRatingController = asyncHandler(async (req, res) => {
+	const { medicineId } = req.params;
+
+	const medicineRating = await Review.aggregate([
+		{
+			$match: { medicine: Types.ObjectId(medicineId) },
+		},
+		{
+			$group: {
+				_id: "$medicine",
+				averageRating: { $avg: "$rating" },
+				count: { $sum: 1 },
+			},
+		},
+	]);
+
+	if (!medicineRating || medicineRating.length === 0) {
+		return res.status(404).json({
+			msg: "no_reviews_found",
+		});
+	}
+
+	const { averageRating, count } = medicineRating[0];
+
+	res.status(200).json({
+		msg: "rating_found",
+		rating: averageRating.toFixed(1),
+		totalRating: count,
+	});
 });

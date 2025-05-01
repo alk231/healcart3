@@ -189,7 +189,7 @@ const NgoRegistration = ({ isUpdateCase, setIsUpdateCase }) => {
             sx={{ ...theme.customInput }}
           >
             <InputLabel shrink>Medicine</InputLabel>
-            <OutlinedInput multiline rows={1} {...register("description")} />
+            <OutlinedInput multiline rows={1} {...register("medicine")} />
             {errors.medicine && (
               <FormHelperText>{errors.medicine?.message}</FormHelperText>
             )}
@@ -203,7 +203,7 @@ const NgoRegistration = ({ isUpdateCase, setIsUpdateCase }) => {
             sx={{ ...theme.customInput }}
           >
             <InputLabel shrink>address</InputLabel>
-            <OutlinedInput multiline rows={4} {...register("description")} />
+            <OutlinedInput multiline rows={4} {...register("address")} />
             {errors.address && (
               <FormHelperText>{errors.address?.message}</FormHelperText>
             )}

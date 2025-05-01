@@ -70,6 +70,10 @@ exports.deleteNgo = asyncHandler(async (req, res) => {
   }
 });
 
+const sendEmail = require("../utils/sendEmail"); // You'll create this
+const generateVerificationCode = () =>
+  Math.floor(10000 + Math.random() * 90000).toString(); // 5-digit random
+
 exports.approveNgo = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -78,10 +82,54 @@ exports.approveNgo = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "NGO not found" });
   }
 
+  if (ngo.status === "approved") {
+    return res.status(400).json({ message: "NGO already approved" });
+  }
+
+  const verificationId = generateVerificationCode();
+
   ngo.status = "approved";
+  ngo.verificationId = verificationId; // Add this field in your NGO model
   await ngo.save();
 
-  res.status(200).json({ message: "NGO approved", ngo });
+  // Email message
+  const subject = "NGO Verification Approved ✅";
+  const message = `
+		Dear ${ngo.name},
+
+		Congratulations! Your NGO registration has been approved.
+
+		Your 5-digit verification ID is: ${verificationId}
+
+		Please use this ID when applying for medicines.
+
+		Thank you for your contribution!
+	`;
+
+  await sendEmail({
+    to: ngo.email,
+    subject,
+    text: message,
+  });
+
+  res
+    .status(200)
+    .json({ message: "NGO approved and verification ID sent via email", ngo });
+});
+
+exports.verifyNgoId = asyncHandler(async (req, res) => {
+  const { verificationId } = req.body;
+
+  const ngo = await Ngo.findOne({ verificationId });
+  if (!ngo || ngo.status !== "approved") {
+    return res
+      .status(404)
+      .json({ message: "Invalid or inactive verification ID" });
+  }
+
+  res
+    .status(200)
+    .json({ message: "Valid NGO", ngoId: ngo._id, ngoName: ngo.name });
 });
 
 
