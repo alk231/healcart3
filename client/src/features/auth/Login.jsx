@@ -53,6 +53,8 @@ const Login = () => {
 		resolver: yupResolver(schema),
 	});
 
+	console.log(import.meta.env.VITE_API_URL);
+
 	const handleClickShowPassword = () => setShowPassword((show) => !show);
 
 	const handleMouseDownPassword = (event) => {
