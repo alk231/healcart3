@@ -36,7 +36,6 @@ const Login = () => {
 	const [login, responseInfo] = useLoginMutation();
 	const [showPassword, setShowPassword] = useState(false);
 	const [serverResError, setServerResError] = useState({ email: "", password: "" });
-	console.log("i have entered succs",VITE_API_URL);
 
 	const schema = yup
 		.object({
