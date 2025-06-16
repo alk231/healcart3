@@ -206,17 +206,13 @@ const Routers = () => {
         <Route
           path="/login"
           element={
-            <AlreadyLoggedIn>
               <Login />
-            </AlreadyLoggedIn>
           }
         />
         <Route
           path="/register"
           element={
-            <AlreadyLoggedIn>
               <Register />
-            </AlreadyLoggedIn>
           }
         />
 
